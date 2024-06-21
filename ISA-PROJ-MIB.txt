@@ -1,0 +1,59 @@
+-- *****************************************************************
+-- ISA-PROJ-MIB mib file for isa project 2020
+-- author: Jakub Kocalka, xkocal00
+-- *****************************************************************
+ISA-PROJ-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    experimental FROM RFC1155-SMI
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, OCTET STRING;
+
+isaProj MODULE-IDENTITY
+    LAST-UPDATED
+    "202010170000Z"
+    ORGANIZATION
+    "FIT VUTBR"
+    CONTACT-INFO
+    "Bozetechova 2 Brno Czechia"
+    DESCRIPTION
+    "MIB object for isa project 2020 implementation"
+::= { experimental 22 }
+
+isaLogin OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Read-only string with the authors xlogin
+    "
+    DEFVAL {"xkocal00"}
+::={isaProj 1}
+
+isaTime OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Read-only string with the current time formated according to RFC 3339
+    "
+::={isaProj 2}
+
+isaInt OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Simple read-write integer
+    "
+::={isaProj 3}
+
+isaInfoOS OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "String containing information about the machines operating system
+    "
+::={isaProj 4}
+
+END

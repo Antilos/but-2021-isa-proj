@@ -1,0 +1,49 @@
+Author: Jakub Kocalka <xkocal00@fit.vutbr.cz>
+File: README
+Date: 10.11.2020
+----------------
+
+Brief:
+    Implementation of ISA project 2020 (SNMP agent).
+    Implements a MIB module and a dynamicaly loaded SNMP agent extension
+----------------
+
+Files:
+    Makefile - makefile for building, installing, and runnning the program
+    manual.pdf - documentation and user manual
+    manual.tex - LaTeX source code used to generate manual.pdf
+    isaProj.c - source code implementing mib module isaProj
+    isaProj.h - header file for isaProj.c
+    ISA-PROJ-MIB.txt - isaProj mib description
+----------------
+
+Building and Installing:
+    Agent can be installed using gmake:
+    $ make build - compiles the program into a dynamically loaded library
+    $ make install - loads the agent
+    $ make - builds and loads the agent
+
+    NOTE: To load the agent you must have root privileges. Also, selinux must be disabled, which can be done temporarily by `sudo setenforce 0` or permanently by setting 'SELINUX' to 'disabled' in '/etc/selinux/config'. `make disableSel` can also by used to temporarily disable selinux.
+
+All make commands:
+    $ make [all] - compiles and loads the agent
+    $ make build - compiles the program into a dynamically loaded library
+    $ make install - loads the agent
+    $ make clean - removes binary files
+    $ make tar - archives projects to xkocal00.tar
+----------------
+
+Using the agent:
+    The agent can be queried using `snmpget`, or the variables can be set using `snmpset` (only .1.3.6.1.3.22.4)
+
+    Objects .1.3.6.1.3.22.1, .1.3.6.1.3.22.2, and .1.3.6.1.3.22.4 are strings, so you also have to specify that you want the beggining of the object by appending '.0'.
+
+    Example (on the machine where the agent is running):
+    get login:
+    `snmpget localhost .1.3.6.1.3.22.1.0`
+
+    get r/w int:
+    `snmpget localhost .1.3.6.1.3.22.3`
+
+    set r/2 int:
+    `snmpset localhost .1.3.6.1.3.22.3 i 10`

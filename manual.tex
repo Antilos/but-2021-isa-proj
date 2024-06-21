@@ -1,0 +1,105 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage[backend=bibtex]{biblatex}
+
+\addbibresource{manual.bib}
+
+\newcommand{\cmdFont}[1]{{\fontfamily{pcr}\selectfont #1}}
+
+\author{Jakub Kocalka, xkocal00}
+\title{SNMP agent extension}
+
+\begin{document}
+	\begin{titlepage}
+		\maketitle
+	\end{titlepage}
+	
+	\tableofcontents
+	
+	\section{SNMP}
+	\label{sec:snmp}
+	Simple Network Managment Protocol (SNMP) is a protocol for managing network equipment.\cite{net-snmp.org} At its core, it allows a management station to treat its network as a distributed database of information. It's an IETF standardized protocol, and should therefore work the same way across every implementation. The data that can be retrieved and manipulated via SNMP is also standardized in a MIB. \cite{tut:snmp}
+	
+	\subsection{MIB}
+	\label{subsec:mib}
+	A management information base (MIB) is a database used for managing the entities in a communication network. MIBs refer to the complete collection of management information on a device. A subset of such information is called a MIB-module. SNMP uses MIB-modules to query and set information on a device.
+	
+	\subsection{SNMP agent}
+	\label{subsec:snmp_agent}
+	SNMP agent is the software that handles SNMP requests on a network node.
+	
+	\section{NET-SNMP}
+	\label{sec:net-snmp}
+	NET-SNMP is a suite of applications used to implement SNMP. It includes (among other things not crucial for this project) command line applications for sending snmp requests, and a library for developing new SNMP applications \cite{net-snmp.org}
+	
+	\section{Agent Extension Implementation}
+	\label{sec:implementation}
+	Source code skeletons (isaProj.c, isaProj.h) where generated using \emph{mib2c}. Handlers for all objects were implemented by hand, except for object \emph{.1.3.6.1.3.22.3} (isaInt), for which the default int handler was used (created using \emph{netsnmp\_register\_int\_instance}).
+	
+	\subsection{Object .1.3.6.1.3.22.4}
+	\label{subsec:variant_object}
+	Object .1.3.6.1.3.22.4 (isaInfoOS) is a read-only string containing a information about the operating system on which the agent runs. When read, it returns "Windows" if the OS is a Windows system, or "Unix" if the OS is a unix or unix-like system. Otherwise, the behavior is undefined.
+	
+	\section{Usage}
+	\label{sec:usage}
+	
+	\subsection{Installation}
+	\label{subsec:installation}
+	 Agent can be installed using gmake:
+	 
+	\$ make build - compiles the program into a dynamically loaded library\\
+	\$ make install - loads the agent and MIB\\
+	\$ make - builds and loads the agent and MIB
+	
+	NOTE: To load the agent you must have root privileges. Also, selinux must be disabled, which can be done temporarily by \cmdFont{sudo setenforce 0} or permanently by setting 'SELINUX' to 'disabled' in '/etc/selinux/config'. \cmdFont{make disableSel} can also by used to temporarily disable selinux.
+	
+	NOTE: Other make commands can be found in README.
+	
+	\subsection{Using the agent}
+	\label{subsec:using_agent}
+	Once the agent is loaded, you can interface with it using NET-SNMP command line utilities.
+	
+	NOTE: Objects .1.3.6.1.3.22.1, .1.3.6.1.3.22.2, and .1.3.6.1.3.22.4 are strings, so you also have to specify that you want the beggining of the object by appending '.0' to the OID.
+	
+	\subsection{Examples}
+	\label{subsec:usage_examples}
+	The following examples are run on the machine where the agent is running, with the MIB loaded:
+	
+	Object .1.3.6.1.3.22.1:
+	\begin{lstlisting}
+	$ snmpget -Oa localhost ISA-PROJ-MIB::isaLogin.0
+	ISA-PROJ-MIB::isaLogin.0 = STRING: "xkocal00."
+	$ 
+	\end{lstlisting}
+
+	Object .1.3.6.1.3.22.2:
+	\begin{lstlisting}
+	$ snmpget -Oa localhost ISA-PROJ-MIB::isaTime.0
+	ISA-PROJ-MIB::isaTime.0 = STRING: "2020-11-15T12:03:51-0500"
+	$ 
+	\end{lstlisting}
+		
+	Object .1.3.6.1.3.22.3:
+	\begin{lstlisting}
+	$ snmpget localhost ISA-PROJ-MIB::isaInt
+	ISA-PROJ-MIB::isaInt = INTEGER: 0
+	$ 
+	\end{lstlisting}
+
+	Object .1.3.6.1.3.22.4:
+	\begin{lstlisting}
+	$ snmpget -Oa localhost ISA-PROJ-MIB::isaInfoOS.0
+	ISA-PROJ-MIB::isaInfoOS.0 = STRING: "Unix."
+	$ 
+	\end{lstlisting}
+
+	\printbibliography
+\end{document}
